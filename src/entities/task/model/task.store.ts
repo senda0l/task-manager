@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import type { TaskPriority, Task } from "./types";
-import { createId } from "~/src/shared/lib/id";
-import { loadFromStorage, saveToStorage } from "~/src/shared/lib/storage";
+import { createId } from "~/shared/lib/id";
+import { loadFromStorage, saveToStorage } from "~/shared/lib/storage";
 
 type Filter = "all" | "completed" | "active";
 
