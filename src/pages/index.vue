@@ -93,7 +93,7 @@ onMounted(() => {
     </div>
 
     <!-- Main Task Card -->
-    <Card>
+    <Card >
       <div class="flex align-middle items-center justify-between pr-7">
         <CardHeader>
           <CardTitle class="text-xl">My Tasks</CardTitle>
@@ -103,7 +103,7 @@ onMounted(() => {
         </CardHeader>
         <TaskForm />
       </div>
-      <CardContent class="space-y-4">
+      <CardContent class="space-y-4 ">
         <Separator />
         <TaskFilters />
         <Separator />
@@ -112,3 +112,6 @@ onMounted(() => {
     </Card>
   </div>
 </template>
+<style scoped>
+
+</style>

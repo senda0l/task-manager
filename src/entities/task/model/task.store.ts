@@ -12,23 +12,36 @@ export const useTaskStore = defineStore("task", {
     tasks: [] as Task[],
     filter: "all" as Filter,
     selectedIds: [] as string[],
+    searchQuery: "",
   }),
   getters: {
     filteredTasks(state) {
+      let result = state.tasks;
       if (state.filter === "active")
-        return state.tasks.filter((t) => t.status === "active");
-      if (state.filter === "completed")
-        return state.tasks.filter((t) => t.status === "done");
-      if (state.filter === "in_progress")
-        return state.tasks.filter((t) => t.status === "in progress");
-      return state.tasks;
+        result = result.filter((t) => t.status === "active");
+      else if (state.filter === "completed")
+        result = result.filter((t) => t.status === "done");
+      else if (state.filter === "in_progress")
+        result = result.filter((t) => t.status === "in progress");
+      if (state.searchQuery.trim()) {
+        const q = state.searchQuery.toLocaleLowerCase();
+        result = result.filter(
+          (t) =>
+            t.title.toLowerCase().includes(q) ||
+            t.describtion?.toLowerCase().includes(q),
+        );
+      }
+
+      return result;
     },
 
     stats(state) {
       const total = state.tasks.length;
       const completed = state.tasks.filter((t) => t.status === "done").length;
       const active = state.tasks.filter((t) => t.status === "active").length;
-      const inProgress = state.tasks.filter((t) => t.status === "in progress").length;
+      const inProgress = state.tasks.filter(
+        (t) => t.status === "in progress",
+      ).length;
       return { total, completed, active, inProgress };
     },
     hasSelected: (state) => state.selectedIds.length > 0,
@@ -115,6 +128,9 @@ export const useTaskStore = defineStore("task", {
 
     setFilter(filter: Filter) {
       this.filter = filter;
+    },
+    setSearch(query: string) {
+      this.searchQuery = query;
     },
   },
 });

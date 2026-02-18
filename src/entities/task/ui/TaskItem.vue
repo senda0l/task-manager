@@ -51,7 +51,7 @@ const statusOptions = [
     :class="
       cn(
         'group flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-accent/50',
-        task.status === 'active' && 'opacity-60',
+        task.status === 'done' && 'opacity-60',
         store.isSelected(task.id) && 'border-primary bg-primary/5',
       )
     "

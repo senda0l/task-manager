@@ -66,7 +66,7 @@ const store = useTaskStore();
         v-else
         name="task"
         tag="div"
-        class="space-y-2 pr-3"
+        class="relative space-y-2 pr-3"
       >
         <TaskItem
           v-for="task in store.filteredTasks"
@@ -79,16 +79,21 @@ const store = useTaskStore();
 </template>
 
 <style scoped>
+.task-move,
 .task-enter-active,
 .task-leave-active {
-  transition: all 0.3s ease;
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
-.task-enter-from {
-  opacity: 0;
-  transform: translateX(-20px);
-}
+
+.task-enter-from,
 .task-leave-to {
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateY(8px);
+}
+
+.task-leave-active {
+  position: absolute;
+  left: 0;
+  right: 0;
 }
 </style>

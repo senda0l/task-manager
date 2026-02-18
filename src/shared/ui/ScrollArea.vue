@@ -7,7 +7,7 @@ const props = defineProps<{
 }>()
 
 const classes = computed(() =>
-  cn('relative w-full overflow-auto', props.class)
+  cn('relative w-full overflow-y-scroll overflow-x-hidden', props.class)
 )
 </script>
 
