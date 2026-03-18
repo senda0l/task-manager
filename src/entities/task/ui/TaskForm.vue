@@ -2,10 +2,10 @@
 import { ref } from "vue";
 import { useTaskStore } from "~/entities/task/model/task.store";
 import { Plus } from "lucide-vue-next";
-import Button from "~/shared/ui/Button.vue";
-import Input from "~/shared/ui/Input.vue";
-import Label from "~/shared/ui/Label.vue";
-import Select from "~/shared/ui/Select.vue";
+import Button from "~/shared/ui/components/Button/index.vue";
+import Input from "~/shared/ui/components/Input/index.vue";
+import Label from "~/shared/ui/components/Label/index.vue";
+import Select from "~/shared/ui/components/Select/index.vue";
 import type { Task, TaskPriority, TaskStatus } from "../model/types";
 import {
   Dialog,
@@ -21,14 +21,14 @@ const store = useTaskStore();
 const title = ref("");
 const describtion = ref("");
 const deadline = ref("");
-const priority = ref<TaskPriority>("medium");
-const status = ref<TaskStatus>("active");
+const priority = ref<TaskPriority>("MEDIUM");
+const status = ref<TaskStatus>("ACTIVE");
 const isTaskModalOpen = ref(false);
 
 const priorityOptions = [
-  { label: "Low", value: "low" },
-  { label: "Medium", value: "medium" },
-  { label: "High", value: "high" },
+  { label: "Low", value: "LOW" },
+  { label: "Medium", value: "MEDIUM" },
+  { label: "High", value: "HIGH" },
 ];
 
 
@@ -45,8 +45,8 @@ const onSubmit = () => {
   title.value = "";
   describtion.value = "";
   deadline.value = "";
-  priority.value = "medium";
-  status.value = "active";
+  priority.value = "MEDIUM";
+  status.value = "ACTIVE";
   isTaskModalOpen.value = false;
 };
 </script>

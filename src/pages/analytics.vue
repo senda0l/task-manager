@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
 import { useTaskStore } from "~/entities/task/model/task.store";
-import Card from "~/shared/ui/Card.vue";
-import CardHeader from "~/shared/ui/CardHeader.vue";
-import CardTitle from "~/shared/ui/CardTitle.vue";
-import CardDescription from "~/shared/ui/CardDescription.vue";
-import CardContent from "~/shared/ui/CardContent.vue";
-import Progress from "~/shared/ui/Progress.vue";
-import Badge from "~/shared/ui/Badge.vue";
-import Separator from "~/shared/ui/Separator.vue";
+import Card from "~/shared/ui/components/Card/index.vue";
+import CardHeader from "~/shared/ui/components/CardHeader/index.vue";
+import CardTitle from "~/shared/ui/components/CardTitle/index.vue";
+import CardDescription from "~/shared/ui/components/CardDescription/index.vue";
+import CardContent from "~/shared/ui/components/CardContent/index.vue";
+import Progress from "~/shared/ui/components/Progress/index.vue";
+import Badge from "~/shared/ui/components/Badge/index.vue";
+import Separator from "~/shared/ui/components/Separator/index.vue";
 import {
   BarChart3,
   CheckCircle2,
@@ -22,9 +22,6 @@ import {
 
 const store = useTaskStore();
 
-onMounted(() => {
-  store.init();
-});
 
 const completionRate = computed(() =>
   store.stats.total > 0
@@ -41,7 +38,10 @@ const priorityBreakdown = computed(() => {
 
 const recentTasks = computed(() => {
   return [...store.tasks]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
     .slice(0, 5);
 });
 
@@ -58,13 +58,17 @@ const overdueTasks = computed(() => {
     <!-- Header -->
     <div>
       <h1 class="text-2xl font-bold tracking-tight">Analytics</h1>
-      <p class="text-muted-foreground">Overview of your task performance and productivity.</p>
+      <p class="text-muted-foreground">
+        Overview of your task performance and productivity.
+      </p>
     </div>
 
     <!-- Summary Cards -->
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
-        <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader
+          class="flex flex-row items-center justify-between space-y-0 pb-2"
+        >
           <CardTitle class="text-sm font-medium">Total Tasks</CardTitle>
           <ListTodo class="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -75,29 +79,39 @@ const overdueTasks = computed(() => {
       </Card>
 
       <Card>
-        <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader
+          class="flex flex-row items-center justify-between space-y-0 pb-2"
+        >
           <CardTitle class="text-sm font-medium">Completed</CardTitle>
           <CheckCircle2 class="h-4 w-4 text-emerald-500" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-emerald-600">{{ store.stats.completed }}</div>
+          <div class="text-2xl font-bold text-emerald-600">
+            {{ store.stats.completed }}
+          </div>
           <p class="text-xs text-muted-foreground">Tasks finished</p>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader
+          class="flex flex-row items-center justify-between space-y-0 pb-2"
+        >
           <CardTitle class="text-sm font-medium">In Progress</CardTitle>
           <Clock class="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-blue-600">{{ store.stats.inProgress }}</div>
+          <div class="text-2xl font-bold text-blue-600">
+            {{ store.stats.inProgress }}
+          </div>
           <p class="text-xs text-muted-foreground">Currently working</p>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader
+          class="flex flex-row items-center justify-between space-y-0 pb-2"
+        >
           <CardTitle class="text-sm font-medium">Completion Rate</CardTitle>
           <TrendingUp class="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -116,7 +130,9 @@ const overdueTasks = computed(() => {
             <Target class="h-5 w-5" />
             Priority Breakdown
           </CardTitle>
-          <CardDescription>Distribution of tasks by priority level.</CardDescription>
+          <CardDescription
+            >Distribution of tasks by priority level.</CardDescription
+          >
         </CardHeader>
         <CardContent class="space-y-4">
           <div class="space-y-3">
@@ -126,14 +142,26 @@ const overdueTasks = computed(() => {
                 <span class="text-sm font-medium">High Priority</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="text-sm text-muted-foreground">{{ priorityBreakdown.high }}</span>
+                <span class="text-sm text-muted-foreground">{{
+                  priorityBreakdown.high
+                }}</span>
                 <Badge variant="destructive" class="text-[10px]">
-                  {{ store.stats.total > 0 ? Math.round((priorityBreakdown.high / store.stats.total) * 100) : 0 }}%
+                  {{
+                    store.stats.total > 0
+                      ? Math.round(
+                          (priorityBreakdown.high / store.stats.total) * 100,
+                        )
+                      : 0
+                  }}%
                 </Badge>
               </div>
             </div>
             <Progress
-              :model-value="store.stats.total > 0 ? (priorityBreakdown.high / store.stats.total) * 100 : 0"
+              :model-value="
+                store.stats.total > 0
+                  ? (priorityBreakdown.high / store.stats.total) * 100
+                  : 0
+              "
               class="h-2"
             />
           </div>
@@ -145,14 +173,26 @@ const overdueTasks = computed(() => {
                 <span class="text-sm font-medium">Medium Priority</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="text-sm text-muted-foreground">{{ priorityBreakdown.medium }}</span>
+                <span class="text-sm text-muted-foreground">{{
+                  priorityBreakdown.medium
+                }}</span>
                 <Badge variant="secondary" class="text-[10px]">
-                  {{ store.stats.total > 0 ? Math.round((priorityBreakdown.medium / store.stats.total) * 100) : 0 }}%
+                  {{
+                    store.stats.total > 0
+                      ? Math.round(
+                          (priorityBreakdown.medium / store.stats.total) * 100,
+                        )
+                      : 0
+                  }}%
                 </Badge>
               </div>
             </div>
             <Progress
-              :model-value="store.stats.total > 0 ? (priorityBreakdown.medium / store.stats.total) * 100 : 0"
+              :model-value="
+                store.stats.total > 0
+                  ? (priorityBreakdown.medium / store.stats.total) * 100
+                  : 0
+              "
               class="h-2"
             />
           </div>
@@ -164,14 +204,26 @@ const overdueTasks = computed(() => {
                 <span class="text-sm font-medium">Low Priority</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="text-sm text-muted-foreground">{{ priorityBreakdown.low }}</span>
+                <span class="text-sm text-muted-foreground">{{
+                  priorityBreakdown.low
+                }}</span>
                 <Badge variant="outline" class="text-[10px]">
-                  {{ store.stats.total > 0 ? Math.round((priorityBreakdown.low / store.stats.total) * 100) : 0 }}%
+                  {{
+                    store.stats.total > 0
+                      ? Math.round(
+                          (priorityBreakdown.low / store.stats.total) * 100,
+                        )
+                      : 0
+                  }}%
                 </Badge>
               </div>
             </div>
             <Progress
-              :model-value="store.stats.total > 0 ? (priorityBreakdown.low / store.stats.total) * 100 : 0"
+              :model-value="
+                store.stats.total > 0
+                  ? (priorityBreakdown.low / store.stats.total) * 100
+                  : 0
+              "
               class="h-2"
             />
           </div>
@@ -190,16 +242,24 @@ const overdueTasks = computed(() => {
         <CardContent>
           <div class="space-y-6">
             <div class="flex items-center gap-4">
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <div
+                class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800"
+              >
                 <ListTodo class="h-6 w-6 text-slate-600 dark:text-slate-400" />
               </div>
               <div class="flex-1">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium">Active</p>
-                  <span class="text-2xl font-bold">{{ store.stats.active }}</span>
+                  <span class="text-2xl font-bold">{{
+                    store.stats.active
+                  }}</span>
                 </div>
                 <Progress
-                  :model-value="store.stats.total > 0 ? (store.stats.active / store.stats.total) * 100 : 0"
+                  :model-value="
+                    store.stats.total > 0
+                      ? (store.stats.active / store.stats.total) * 100
+                      : 0
+                  "
                   class="mt-1 h-1.5"
                 />
               </div>
@@ -208,16 +268,24 @@ const overdueTasks = computed(() => {
             <Separator />
 
             <div class="flex items-center gap-4">
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+              <div
+                class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30"
+              >
                 <Clock class="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div class="flex-1">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium">In Progress</p>
-                  <span class="text-2xl font-bold">{{ store.stats.inProgress }}</span>
+                  <span class="text-2xl font-bold">{{
+                    store.stats.inProgress
+                  }}</span>
                 </div>
                 <Progress
-                  :model-value="store.stats.total > 0 ? (store.stats.inProgress / store.stats.total) * 100 : 0"
+                  :model-value="
+                    store.stats.total > 0
+                      ? (store.stats.inProgress / store.stats.total) * 100
+                      : 0
+                  "
                   class="mt-1 h-1.5"
                 />
               </div>
@@ -226,16 +294,26 @@ const overdueTasks = computed(() => {
             <Separator />
 
             <div class="flex items-center gap-4">
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                <CheckCircle2 class="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              <div
+                class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30"
+              >
+                <CheckCircle2
+                  class="h-6 w-6 text-emerald-600 dark:text-emerald-400"
+                />
               </div>
               <div class="flex-1">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium">Completed</p>
-                  <span class="text-2xl font-bold">{{ store.stats.completed }}</span>
+                  <span class="text-2xl font-bold">{{
+                    store.stats.completed
+                  }}</span>
                 </div>
                 <Progress
-                  :model-value="store.stats.total > 0 ? (store.stats.completed / store.stats.total) * 100 : 0"
+                  :model-value="
+                    store.stats.total > 0
+                      ? (store.stats.completed / store.stats.total) * 100
+                      : 0
+                  "
                   class="mt-1 h-1.5"
                 />
               </div>
@@ -251,10 +329,16 @@ const overdueTasks = computed(() => {
             <CalendarDays class="h-5 w-5 text-red-500" />
             Overdue Tasks
           </CardTitle>
-          <CardDescription>Tasks past their deadline that still need attention.</CardDescription>
+          <CardDescription
+            >Tasks past their deadline that still need
+            attention.</CardDescription
+          >
         </CardHeader>
         <CardContent>
-          <div v-if="overdueTasks.length === 0" class="py-6 text-center text-sm text-muted-foreground">
+          <div
+            v-if="overdueTasks.length === 0"
+            class="py-6 text-center text-sm text-muted-foreground"
+          >
             No overdue tasks. You're on track!
           </div>
           <div v-else class="space-y-3">
@@ -265,9 +349,13 @@ const overdueTasks = computed(() => {
             >
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-medium truncate">{{ task.title }}</p>
-                <p class="text-xs text-red-600 dark:text-red-400">Due: {{ task.deadline }}</p>
+                <p class="text-xs text-red-600 dark:text-red-400">
+                  Due: {{ task.deadline }}
+                </p>
               </div>
-              <Badge variant="destructive" class="shrink-0 text-[10px]">{{ task.priority }}</Badge>
+              <Badge variant="destructive" class="shrink-0 text-[10px]">{{
+                task.priority
+              }}</Badge>
             </div>
           </div>
         </CardContent>
@@ -283,7 +371,10 @@ const overdueTasks = computed(() => {
           <CardDescription>Your latest created tasks.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div v-if="recentTasks.length === 0" class="py-6 text-center text-sm text-muted-foreground">
+          <div
+            v-if="recentTasks.length === 0"
+            class="py-6 text-center text-sm text-muted-foreground"
+          >
             No tasks yet. Create one to get started!
           </div>
           <div v-else class="space-y-3">
@@ -295,15 +386,19 @@ const overdueTasks = computed(() => {
               <div
                 :class="[
                   'h-2 w-2 rounded-full shrink-0',
-                  task.status === 'done' ? 'bg-emerald-500' :
-                  task.status === 'in progress' ? 'bg-blue-500' : 'bg-slate-400',
+                  task.status === 'DONE'
+                    ? 'bg-emerald-500'
+                    : task.status === 'in progress'
+                      ? 'bg-blue-500'
+                      : 'bg-slate-400',
                 ]"
               />
               <div class="min-w-0 flex-1">
                 <p
                   :class="[
                     'text-sm font-medium truncate',
-                    task.status === 'done' && 'line-through text-muted-foreground',
+                    task.status === 'DONE' &&
+                      'line-through text-muted-foreground',
                   ]"
                 >
                   {{ task.title }}
@@ -313,7 +408,13 @@ const overdueTasks = computed(() => {
                 </p>
               </div>
               <Badge
-                :variant="task.status === 'done' ? 'default' : task.status === 'in progress' ? 'secondary' : 'outline'"
+                :variant="
+                  task.status === 'DONE'
+                    ? 'default'
+                    : task.status === 'IN_PROGRESS'
+                      ? 'secondary'
+                      : 'outline'
+                "
                 class="shrink-0 text-[10px]"
               >
                 {{ task.status }}

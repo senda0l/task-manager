@@ -10,11 +10,12 @@ import {
   Clock,
   BarChart3,
 } from "lucide-vue-next";
-import Separator from "~/shared/ui/Separator.vue";
+import Separator from "~/shared/ui/components/Separator/index.vue";
 import { cn } from "~/shared/lib/utils";
 import { useTaskStore } from "~/entities/task/model/task.store";
 const store = useTaskStore();
 const route = useRoute();
+const router = useRouter();
 const collapsed = ref(false);
 
 const navigation = [
@@ -44,7 +45,10 @@ const isActive = (href: string) => {
   >
     <!-- Header -->
     <div class="flex h-14 items-center px-4">
-      <div class="flex items-center gap-2 overflow-hidden">
+      <div
+        class="flex items-center gap-2 overflow-hidden cursor-pointer"
+        @click="router.push('/')"
+      >
         <div
           class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
         >

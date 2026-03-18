@@ -1,0 +1,1 @@
+export { default as CardDescription } from './index.vue'

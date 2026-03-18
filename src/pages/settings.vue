@@ -1,23 +1,29 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import Card from "~/shared/ui/Card.vue";
-import CardHeader from "~/shared/ui/CardHeader.vue";
-import CardTitle from "~/shared/ui/CardTitle.vue";
-import CardDescription from "~/shared/ui/CardDescription.vue";
-import CardContent from "~/shared/ui/CardContent.vue";
-import Label from "~/shared/ui/Label.vue";
-import Input from "~/shared/ui/Input.vue";
-import Button from "~/shared/ui/Button.vue";
-import Switch from "~/shared/ui/Switch.vue";
-import Separator from "~/shared/ui/Separator.vue";
+import Card from "~/shared/ui/components/Card/index.vue";
+import CardHeader from "~/shared/ui/components/CardHeader/index.vue";
+import CardTitle from "~/shared/ui/components/CardTitle/index.vue";
+import CardDescription from "~/shared/ui/components/CardDescription/index.vue";
+import CardContent from "~/shared/ui/components/CardContent/index.vue";
+import Label from "~/shared/ui/components/Label/index.vue";
+import Input from "~/shared/ui/components/Input/index.vue";
+import Button from "~/shared/ui/components/Button/index.vue";
+import Switch from "~/shared/ui/components/Switch/index.vue";
+import Separator from "~/shared/ui/components/Separator/index.vue";
 import { useTaskStore } from "~/entities/task/model/task.store";
-import { Save, Trash2, Download, Upload, User, Bell, Palette } from "lucide-vue-next";
+import {
+  Save,
+  Trash2,
+  Download,
+  Upload,
+  User,
+  Bell,
+  Palette,
+} from "lucide-vue-next";
+import { useAuthStore } from "~/entities/auth/useAuth";
 
+const auth = useAuthStore();
 const store = useTaskStore();
-
-onMounted(() => {
-  store.init();
-});
 
 // Profile
 const displayName = ref("User");
@@ -79,9 +85,11 @@ const importTasks = (event: Event) => {
 };
 
 const clearAllTasks = () => {
-  if (confirm("Are you sure you want to delete ALL tasks? This cannot be undone.")) {
+  if (
+    confirm("Are you sure you want to delete ALL tasks? This cannot be undone.")
+  ) {
     store.tasks = [];
-    store.persist();
+    store.bulkDelete();
   }
 };
 </script>
@@ -105,11 +113,20 @@ const clearAllTasks = () => {
       <CardContent class="space-y-4">
         <div class="space-y-2">
           <Label for="display-name">Display Name</Label>
-          <Input id="display-name" v-model="displayName" placeholder="Your name" />
+          <Input
+            id="display-name"
+            v-model="displayName"
+            placeholder="Your name"
+          />
         </div>
         <div class="space-y-2">
           <Label for="email">Email</Label>
-          <Input id="email" v-model="email" type="email" placeholder="you@example.com" />
+          <Input
+            id="email"
+            v-model="email"
+            type="email"
+            placeholder="you@example.com"
+          />
         </div>
       </CardContent>
     </Card>
@@ -127,7 +144,9 @@ const clearAllTasks = () => {
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium">Dark Mode</p>
-            <p class="text-xs text-muted-foreground">Toggle between light and dark theme.</p>
+            <p class="text-xs text-muted-foreground">
+              Toggle between light and dark theme.
+            </p>
           </div>
           <Switch :checked="isDark" @update:checked="toggleDarkMode" />
         </div>
@@ -141,23 +160,35 @@ const clearAllTasks = () => {
           <Bell class="h-5 w-5" />
           Notifications
         </CardTitle>
-        <CardDescription>Configure when you want to be notified.</CardDescription>
+        <CardDescription
+          >Configure when you want to be notified.</CardDescription
+        >
       </CardHeader>
       <CardContent class="space-y-4">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium">Deadline Reminders</p>
-            <p class="text-xs text-muted-foreground">Get notified before a task deadline.</p>
+            <p class="text-xs text-muted-foreground">
+              Get notified before a task deadline.
+            </p>
           </div>
-          <Switch :checked="notifyOnDeadline" @update:checked="notifyOnDeadline = $event" />
+          <Switch
+            :checked="notifyOnDeadline"
+            @update:checked="notifyOnDeadline = $event"
+          />
         </div>
         <Separator />
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium">Task Completed</p>
-            <p class="text-xs text-muted-foreground">Notification when a task is marked done.</p>
+            <p class="text-xs text-muted-foreground">
+              Notification when a task is marked done.
+            </p>
           </div>
-          <Switch :checked="notifyOnComplete" @update:checked="notifyOnComplete = $event" />
+          <Switch
+            :checked="notifyOnComplete"
+            @update:checked="notifyOnComplete = $event"
+          />
         </div>
       </CardContent>
     </Card>
@@ -166,7 +197,9 @@ const clearAllTasks = () => {
     <Card>
       <CardHeader>
         <CardTitle>Data Management</CardTitle>
-        <CardDescription>Export, import, or clear your task data.</CardDescription>
+        <CardDescription
+          >Export, import, or clear your task data.</CardDescription
+        >
       </CardHeader>
       <CardContent class="space-y-4">
         <div class="flex flex-wrap gap-3">
@@ -200,6 +233,10 @@ const clearAllTasks = () => {
           </Button>
         </div>
       </CardContent>
+      <Button variant="outline" @click="auth.logout">
+        <Upload class="h-4 w-4 mr-2" />
+        Logout
+      </Button>
     </Card>
   </div>
 </template>

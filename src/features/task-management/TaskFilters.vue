@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { useTaskStore } from "~/entities/task/model/task.store";
-import Button from "~/shared/ui/Button.vue";
-import Badge from "~/shared/ui/Badge.vue";
-import Separator from "~/shared/ui/Separator.vue";
+import Button from "~/shared/ui/components/Button/index.vue";
+import Badge from "~/shared/ui/components/Badge/index.vue";
+import Separator from "~/shared/ui/components/Separator/index.vue";
 import { ListFilter } from "lucide-vue-next";
+import Select from "~/shared/ui/components/Select/index.vue";
 
 const store = useTaskStore();
-
+const selectedFilter = ref('all')
 const filters = [
   { label: "All", value: "all" as const },
   { label: "Active", value: "active" as const },
   { label: "In progress", value: "in_progress" as const },
   { label: "Completed", value: "completed" as const },
+  { label: "Overdue", value: "overdue" as const },
 ];
 </script>
 
@@ -37,6 +39,7 @@ const filters = [
 
     <Separator orientation="vertical" class="h-5 hidden sm:block" />
 
+    
     <div class="flex items-center gap-3 ml-auto text-xs text-muted-foreground">
       <div class="flex items-center gap-1.5">
         <span>Total</span>

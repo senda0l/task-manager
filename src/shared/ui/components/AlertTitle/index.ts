@@ -1,0 +1,1 @@
+export { default as AlertTitle } from './index.vue'

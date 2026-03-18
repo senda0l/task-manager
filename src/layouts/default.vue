@@ -20,3 +20,4 @@ import AppNavbar from '~/components/layout/AppNavbar.vue'
     </div>
   </div>
 </template>
+` `

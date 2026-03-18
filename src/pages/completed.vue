@@ -2,18 +2,17 @@
 import { onMounted } from "vue";
 import { useTaskStore } from "~/entities/task/model/task.store";
 import TaskList from "~/entities/task/ui/TaskList.vue";
-import Card from "~/shared/ui/Card.vue";
-import CardHeader from "~/shared/ui/CardHeader.vue";
-import CardTitle from "~/shared/ui/CardTitle.vue";
-import CardDescription from "~/shared/ui/CardDescription.vue";
-import CardContent from "~/shared/ui/CardContent.vue";
-import Badge from "~/shared/ui/Badge.vue";
+import Card from "~/shared/ui/components/Card/index.vue";
+import CardHeader from "~/shared/ui/components/CardHeader/index.vue";
+import CardTitle from "~/shared/ui/components/CardTitle/index.vue";
+import CardDescription from "~/shared/ui/components/CardDescription/index.vue";
+import CardContent from "~/shared/ui/components/CardContent/index.vue";
+import Badge from "~/shared/ui/components/Badge/index.vue";
 import { CheckCircle2 } from "lucide-vue-next";
 
 const store = useTaskStore();
 
 onMounted(() => {
-  store.init();
   store.setFilter("completed");
 });
 </script>

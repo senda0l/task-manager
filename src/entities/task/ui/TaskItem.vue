@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Task, TaskStatus } from "~/entities/task/model/types";
 import { useTaskStore } from "~/entities/task/model/task.store";
-import { Newspaper, Trash2 } from "lucide-vue-next";
-import Checkbox from "~/shared/ui/Checkbox.vue";
-import Button from "~/shared/ui/Button.vue";
-import Badge from "~/shared/ui/Badge.vue";
-import Select from "~/shared/ui/Select.vue";
+import { Trash2 } from "lucide-vue-next";
+import { Checkbox } from "~/shared/ui";
+import { Button } from "~/shared/ui";
+import { Badge } from "~/shared/ui";
+import { Select } from "~/shared/ui";
 import { cn } from "~/shared/lib/utils";
 
 const props = defineProps<{ task: Task }>();
@@ -13,15 +13,23 @@ const store = useTaskStore();
 const status = ref<TaskStatus>(props.task.status);
 const priorityVariant = (priority: string) => {
   switch (priority) {
-    case "high":
+    case "HIGH":
       return "destructive";
-    case "medium":
+    case "MEDIUM":
       return "default";
-    case "low":
+    case "LOW":
       return "secondary";
     default:
       return "outline";
   }
+};
+
+const formatDeadline = (deadline: string) => {
+  return new Date(deadline).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 
 watch(
@@ -31,19 +39,17 @@ watch(
   },
 );
 
-watch(status, (newStatus) => {
+watch(status, async (newStatus) => {
   if (newStatus !== props.task.status) {
-    store.updateTaskStatus(props.task.id, newStatus as TaskStatus);
+    await store.updateTaskStatus(props.task.id, newStatus as TaskStatus);
   }
 });
 
 const statusOptions = [
-  { label: "Active", value: "active" },
-  { label: "In Progress", value: "in progress" },
-  { label: "Done", value: "done" },
+  { label: "Active", value: "ACTIVE" },
+  { label: "In Progress", value: "IN_PROGRESS" },
+  { label: "Done", value: "DONE" },
 ];
-
-
 </script>
 
 <template>
@@ -51,21 +57,24 @@ const statusOptions = [
     :class="
       cn(
         'group flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-accent/50',
-        task.status === 'done' && 'opacity-60',
+        task.status === 'DONE' && 'opacity-60',
+        store.isTaskOverdue(task) &&
+          'border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/30',
         store.isSelected(task.id) && 'border-primary bg-primary/5',
       )
     "
   >
     <Checkbox
-    :checked="store.isSelected(task.id)"
-    @update:checked="store.toggleSelect(task.id)" />
+      :checked="store.isSelected(task.id)"
+      @update:checked="store.toggleSelect(task.id)"
+    />
 
     <div class="flex-1 min-w-0">
       <p
         :class="
           cn(
             'text-sm font-medium leading-none truncate',
-            task.status === 'done' && 'line-through text-muted-foreground',
+            task.status === 'DONE' && 'line-through text-muted-foreground',
           )
         "
       >
@@ -81,9 +90,16 @@ const statusOptions = [
     <div>
       <p
         v-if="task.deadline"
-        class="text-xs text-muted-foreground mt-1 truncate"
+        :class="
+          cn(
+            'text-xs truncate',
+            store.isTaskOverdue(task)
+              ? 'text-red-500 font-medium'
+              : 'text-muted-foreground',
+          )
+        "
       >
-        Deadline: {{ task.deadline }}
+        Deadline: {{ formatDeadline(task.deadline) }}
       </p>
     </div>
 

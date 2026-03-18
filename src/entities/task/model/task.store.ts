@@ -2,10 +2,20 @@ import { defineStore } from "pinia";
 import type { TaskPriority, Task, TaskStatus } from "./types";
 import { createId } from "~/shared/lib/id";
 import { loadFromStorage, saveToStorage } from "~/shared/lib/storage";
+import { useApi } from "~/shared/api";
 
-type Filter = "all" | "completed" | "active" | "in_progress";
+type Filter = "all" | "completed" | "active" | "in_progress" | "overdue";
 
 const STORAGE_KEY = "tasks:v1";
+
+function isOverdue(task: Task): boolean {
+  if (task.status === "DONE") return false;
+  if (!task.deadline) return false;
+  return (
+    new Date(task.deadline) < new Date() &&
+    new Date(task.deadline) == new Date()
+  );
+}
 
 export const useTaskStore = defineStore("task", {
   state: () => ({
@@ -13,16 +23,20 @@ export const useTaskStore = defineStore("task", {
     filter: "all" as Filter,
     selectedIds: [] as string[],
     searchQuery: "",
+    loading: false,
   }),
   getters: {
     filteredTasks(state) {
       let result = state.tasks;
       if (state.filter === "active")
-        result = result.filter((t) => t.status === "active");
+        result = result.filter((t) => t.status === "ACTIVE");
       else if (state.filter === "completed")
-        result = result.filter((t) => t.status === "done");
+        result = result.filter((t) => t.status === "DONE");
       else if (state.filter === "in_progress")
-        result = result.filter((t) => t.status === "in progress");
+        result = result.filter((t) => t.status === "IN_PROGRESS");
+      else if (state.filter === "overdue")
+        result = result.filter((t) => isOverdue(t));
+
       if (state.searchQuery.trim()) {
         const q = state.searchQuery.toLocaleLowerCase();
         result = result.filter(
@@ -34,15 +48,20 @@ export const useTaskStore = defineStore("task", {
 
       return result;
     },
+    overdueTasks(state): Task[] {
+      return state.tasks.filter((t) => isOverdue(t));
+    },
+    isTaskOverdue: () => (task: Task) => isOverdue(task),
 
     stats(state) {
       const total = state.tasks.length;
-      const completed = state.tasks.filter((t) => t.status === "done").length;
-      const active = state.tasks.filter((t) => t.status === "active").length;
+      const completed = state.tasks.filter((t) => t.status === "DONE").length;
+      const active = state.tasks.filter((t) => t.status === "ACTIVE").length;
       const inProgress = state.tasks.filter(
-        (t) => t.status === "in progress",
+        (t) => t.status === "IN_PROGRESS",
       ).length;
-      return { total, completed, active, inProgress };
+      const overdue = state.tasks.filter((t) => isOverdue(t)).length;
+      return { total, completed, active, inProgress, overdue };
     },
     hasSelected: (state) => state.selectedIds.length > 0,
     selectedCount: (state) => state.selectedIds.length,
@@ -50,80 +69,71 @@ export const useTaskStore = defineStore("task", {
   },
 
   actions: {
-    init() {
-      this.tasks = loadFromStorage<Task[]>(STORAGE_KEY, []);
-    },
-    persist() {
-      saveToStorage(STORAGE_KEY, this.tasks);
+    async fetchTasks() {
+      const api = useApi();
+      this.loading = true;
+      try {
+        this.tasks = await api<Task[]>("/tasks");
+      } finally {
+        this.loading = false;
+      }
     },
 
-    addTask(payload: {
+    async addTask(payload: {
       title: string;
       describtion?: string;
       priority?: TaskPriority;
       status?: import("./types").TaskStatus;
       deadline?: string;
     }) {
-      const title = payload.title.trim();
-      if (!title) return;
-
-      const task: Task = {
-        id: createId(),
-        title,
-        describtion: payload.describtion?.trim() || undefined,
-        createdAt: new Date().toISOString(),
-        priority: payload.priority ?? "medium",
-        status: payload.status ?? "active",
-        deadline: payload.deadline || undefined,
-      };
+      const api = useApi();
+      const task = await api<Task>("/tasks", {
+        method: "POST",
+        body: payload,
+      });
       this.tasks.unshift(task);
-      this.persist();
     },
 
-    toggleTask(id: string) {
-      const t = this.tasks.find((x) => x.id === id);
-      if (!t) return;
-      t.status = "active";
-      this.persist();
-    },
+    async removeTask(id: string) {
+      const api = useApi();
+      await api(`/tasks/${id}`, { method: "DELETE" });
 
-    removeTask(id: string) {
       this.tasks = this.tasks.filter((t) => t.id !== id);
-      this.persist();
     },
 
-    updateTask(id: string, patch: Partial<Omit<Task, "id" | "createdAt">>) {
-      const t = this.tasks.find((x) => x.id === id);
-      if (!t) return;
-      Object.assign(t, patch);
-      this.persist();
+    async updateTask(
+      id: string,
+      patch: Partial<Omit<Task, "id" | "createdAt">>,
+    ) {
+      const api = useApi();
+      console.log("sending patch:", patch);
+      const updated = await api<Task>(`/tasks/${id}`, {
+        method: "PATCH",
+        body: patch,
+      });
+      console.log("updated task from backend:", updated);
+
+      const index = this.tasks.findIndex((x) => x.id === id);
+      if (index != -1) this.tasks[index] = updated;
     },
-    updateTaskStatus(id: string, status: TaskStatus) {
-      const task = this.tasks.find((x) => x.id === id);
-      if (task) {
-        task.status = status;
-        this.persist();
-      }
+    async updateTaskStatus(id: string, status: TaskStatus) {
+      await this.updateTask(id, { status });
     },
 
-    toggleSelect(id: string) {
+    async toggleSelect(id: string) {
       const index = this.selectedIds.indexOf(id);
-      if (index === -1) {
-        this.selectedIds.push(id);
-      } else {
-        this.selectedIds.splice(index, 1);
-      }
+      if (index === -1) this.selectedIds.push(id);
+      else this.selectedIds.splice(index, 1);
     },
-    selectAll() {
+    async bulkDelete() {
+      await Promise.all(this.selectedIds.map((id) => this.removeTask(id)));
+      this.selectedIds = [];
+    },
+    async selectAll() {
       this.selectedIds = this.tasks.map((t) => t.id);
     },
     deselectAll() {
       this.selectedIds = [];
-    },
-    bulkDelete() {
-      this.tasks = this.tasks.filter((t) => !this.selectedIds.includes(t.id));
-      this.selectedIds = [];
-      this.persist();
     },
 
     setFilter(filter: Filter) {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Search, Bell, User, Sun, Moon } from "lucide-vue-next";
-import Button from "~/shared/ui/Button.vue";
-import Input from "~/shared/ui/Input.vue";
-import Separator from "~/shared/ui/Separator.vue";
+import Button from "~/shared/ui/components/Button/index.vue";
+import Input from "~/shared/ui/components/Input/index.vue";
+import Separator from "~/shared/ui/components/Separator/index.vue";
 import { ref, computed } from "vue";
 import { useTaskStore } from "~/entities/task/model/task.store";
 const store = useTaskStore();

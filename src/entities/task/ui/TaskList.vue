@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useTaskStore } from "~/entities/task/model/task.store";
 import TaskItem from "./TaskItem.vue";
-import ScrollArea from "~/shared/ui/ScrollArea.vue";
-import Button from "~/shared/ui/Button.vue";
+import ScrollArea from "~/shared/ui/components/ScrollArea/index.vue";
+import Button from "~/shared/ui/components/Button/index.vue";
 import { Trash2, CheckSquare, XSquare } from "lucide-vue-next";
 
 const store = useTaskStore();

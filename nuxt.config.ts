@@ -14,11 +14,17 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
   shadcn: {
     prefix: "",
-    componentDir: "./src/shared/ui",
+    componentDir: "~/shared/ui/components",
   },
   components: {
     dirs: [
       { path: "~/components", pathPrefix: false },
+      { path: "~/shared/ui/components", pathPrefix: false },
     ],
+  },
+  runtimeConfig: {
+    public: {
+      apiUrl: process.env.NUXT_PUBLIC_API_URL || "http://localhost:3000",
+    },
   },
 });

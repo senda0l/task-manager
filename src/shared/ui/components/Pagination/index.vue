@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type HTMLAttributes, computed } from 'vue'
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-vue-next'
-import Button from '~/shared/ui/Button.vue'
+import Button from '~/shared/ui/components/Button/index.vue'
 import { cn } from '~/shared/lib/utils'
 
 const props = defineProps<{

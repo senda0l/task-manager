@@ -4,18 +4,19 @@ import { useTaskStore } from "~/entities/task/model/task.store";
 import TaskForm from "~/entities/task/ui/TaskForm.vue";
 import TaskList from "~/entities/task/ui/TaskList.vue";
 import TaskFilters from "~/features/task-management/TaskFilters.vue";
-import Card from "~/shared/ui/Card.vue";
-import CardHeader from "~/shared/ui/CardHeader.vue";
-import CardTitle from "~/shared/ui/CardTitle.vue";
-import CardDescription from "~/shared/ui/CardDescription.vue";
-import CardContent from "~/shared/ui/CardContent.vue";
-import Separator from "~/shared/ui/Separator.vue";
+import Card from "~/shared/ui/components/Card/index.vue";
+import CardHeader from "~/shared/ui/components/CardHeader/index.vue";
+import CardTitle from "~/shared/ui/components/CardTitle/index.vue";
+import CardDescription from "~/shared/ui/components/CardDescription/index.vue";
+import CardContent from "~/shared/ui/components/CardContent/index.vue";
+import Separator from "~/shared/ui/components/Separator/index.vue";
 import { ClipboardList, CheckCircle2, Clock, BarChart3 } from "lucide-vue-next";
 
 const store = useTaskStore();
 
-onMounted(() => {
-  store.init();
+onMounted(async () => {
+  await store.fetchTasks();
+  store.setFilter("all");
 });
 </script>
 
@@ -93,7 +94,7 @@ onMounted(() => {
     </div>
 
     <!-- Main Task Card -->
-    <Card >
+    <Card>
       <div class="flex align-middle items-center justify-between pr-7">
         <CardHeader>
           <CardTitle class="text-xl">My Tasks</CardTitle>
@@ -103,7 +104,7 @@ onMounted(() => {
         </CardHeader>
         <TaskForm />
       </div>
-      <CardContent class="space-y-4 ">
+      <CardContent class="space-y-4">
         <Separator />
         <TaskFilters />
         <Separator />
@@ -112,6 +113,4 @@ onMounted(() => {
     </Card>
   </div>
 </template>
-<style scoped>
-
-</style>
+<style scoped></style>
